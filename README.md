@@ -1,4 +1,4 @@
-# FMD-brachialtools-analyzer
+# FMD Vessel Analyzer (WIP)
 R script for the analysis of FMD including viscosity and shear stress calculations
 
 The FMD-R Scripts are designed for the automated analysis of FMD and blood viscosity using data from Brachial Tools Software and Labchart
