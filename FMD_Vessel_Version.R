@@ -63,6 +63,7 @@ dia_data <- subset(dia_data, select = c("diameter","index","participant_id"))
 #file_id
 file.id<- as.character(dia_data[1,3])
 file.id <- str_replace_all(string=file.id, pattern=".txt", repl="")
+participant.id <- file.id
 
 
 fmd_data <- cbind(head(dia_data,5000),head(lc_data,5000))
