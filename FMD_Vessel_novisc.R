@@ -1,22 +1,17 @@
 ### LIBLOAD
-
 # Define the packages you want to use
 packages <- c(
   "tidyverse", "zoo", "imputeTS", "stringr", "magick", 
   "ggplot2", "devtools", "bayestestR", "curl", "tcltk","fs"
 )
-
 # Function to install and load packages
 install_load_packages <- function(packages) {
-  # Update all packages without prompting
-  update.packages(ask = FALSE)
-  
   # Check which packages are not installed
   not_installed <- setdiff(packages, rownames(installed.packages()))
   
-  # Install the missing packages without prompting for updates
+  # Install the missing packages
   if (length(not_installed) > 0) {
-    install.packages(not_installed, ask = FALSE)
+    install.packages(not_installed)
   }
   
   # Load all the packages
