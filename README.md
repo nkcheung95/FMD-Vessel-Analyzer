@@ -19,7 +19,7 @@ Run Script version required using given command
  - FMD-R Vessel Launcher
 	 - No viscosity model - diameter from VesselApp in labchart
 ```R
-source("https://github.com/nkcheung95/FMD-Vessel-Analyzer/blob/main/FMDVesselAnalysis-loader.R)?raw=TRUE")
+source("https://github.com/nkcheung95/FMD-Vessel-Analyzer?raw=TRUE")
 ```
 
 Results immediately available for QC in working directory and saved under participant IDs from the brachial tools output.
