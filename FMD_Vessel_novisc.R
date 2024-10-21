@@ -26,8 +26,6 @@ install_load_packages <- function(packages) {
 # Call the function to install and load packages
 install_load_packages(packages)
 
-# Additional step for installing a package from GitHub
-devtools::install_github("TJMurphy/nlfitr", force = TRUE)
 
 #filesystem_create
 
