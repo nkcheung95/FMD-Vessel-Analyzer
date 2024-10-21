@@ -102,7 +102,23 @@ server <- function(input, output, session) {
     
     busy(FALSE)
   })
-  
+  observeEvent(input$vessel_clean, {
+    busy(TRUE)
+    status(NULL)
+    output$loading_text <- renderText({ "Running Vessel diameter cleaner" })
+    
+    # Simulate a script run with a delay
+    later::later(function() {
+      # Try to source the  Analysis script
+      tryCatch({
+        source("https://github.com/nkcheung95/FMD-Diameter-Cleaner/blob/main/FMD-Dia-Clean-load.r?raw=TRUE")
+        status("Vessel diameter cleaned!")
+      }, error = function(e) {
+        status(paste("Error during Diameter Cleaning:", e$message))
+      })
+      busy(FALSE)
+    }, delay = 2)  # Adjust delay as needed
+  }) 
   observeEvent(input$fmd_mod, {
     busy(TRUE)
     status(NULL)
@@ -112,7 +128,7 @@ server <- function(input, output, session) {
     later::later(function() {
       # Try to source the  Analysis script
       tryCatch({
-        source("https://github.com/nkcheung95/FMD-brachialtools-analyzer/blob/main/FMD_R_mod_visc.r?raw=TRUE")
+        source("https://github.com/nkcheung95/FMD-Vessel-Analyzer/blob/main/FMD_Vessel_novisc.R?raw=TRUE")
         status("FMD Analysis Completed!")
       }, error = function(e) {
         status(paste("Error during FMD Analysis:", e$message))
@@ -129,7 +145,7 @@ server <- function(input, output, session) {
     later::later(function() {
       # Try to source the  Analysis script
       tryCatch({
-        source("https://github.com/nkcheung95/FMD-brachialtools-analyzer/blob/main/FMD_R_mod_visc_FLIPPED.r?raw=TRUE")
+        source("https://github.com/nkcheung95/FMD-Vessel-Analyzer/blob/main/FMD_Vessel_novisc.R?raw=TRUE")
         status("FMD Analysis Completed!")
       }, error = function(e) {
         status(paste("Error during FMD Analysis:", e$message))
@@ -147,7 +163,7 @@ server <- function(input, output, session) {
     later::later(function() {
       # Try to source the  Analysis script
       tryCatch({
-        source("https://github.com/nkcheung95/FMD-brachialtools-analyzer/blob/main/FMD_R_sp_visc.r?raw=TRUE")
+        source("https://github.com/nkcheung95/FMD-Vessel-Analyzer/blob/main/FMD_Vessel_novisc.R?raw=TRUE")
         status("FMD Analysis Completed!")
       }, error = function(e) {
         status(paste("Error during FMD Analysis:", e$message))
@@ -164,7 +180,7 @@ server <- function(input, output, session) {
     later::later(function() {
       # Try to source the  Analysis script
       tryCatch({
-        source("https://github.com/nkcheung95/FMD-brachialtools-analyzer/blob/main/FMD_R_sp_visc_FLIPPED.r?raw=TRUE")
+        source("https://github.com/nkcheung95/FMD-Vessel-Analyzer/blob/main/FMD_Vessel_novisc.R?raw=TRUE")
         status("FMD Analysis Completed!")
       }, error = function(e) {
         status(paste("Error during FMD Analysis:", e$message))
@@ -182,7 +198,7 @@ server <- function(input, output, session) {
     later::later(function() {
       # Try to source the  Analysis script
       tryCatch({
-        source("https://github.com/nkcheung95/FMD-brachialtools-analyzer/blob/main/FMD_R_mod_visc.r?raw=TRUE")
+        source("https://github.com/nkcheung95/FMD-Vessel-Analyzer/blob/main/FMD_Vessel_novisc.R?raw=TRUE")
         status("FMD Analysis Completed!")
       }, error = function(e) {
         status(paste("Error during FMD Analysis:", e$message))
@@ -200,7 +216,7 @@ server <- function(input, output, session) {
     later::later(function() {
       # Try to source the  Analysis script
       tryCatch({
-        source("https://github.com/nkcheung95/FMD-brachialtools-analyzer/blob/main/FMD_R_no_visc_FLIPPED.r?raw=TRUE")
+        source("https://github.com/nkcheung95/FMD-Vessel-Analyzer/blob/main/FMD_Vessel_novisc.R?raw=TRUE")
         status("FMD Analysis Completed!")
       }, error = function(e) {
         status(paste("Error during FMD Analysis:", e$message))
