@@ -1,36 +1,33 @@
-#libload
-packages <- c("tidyverse", "zoo", "imputeTS","stringr","magick","ggplot2","devtools","bayestestR","curl")
+### LIBLOAD
 
-install.packages(setdiff(packages, rownames(installed.packages()))) 
-library(devtools)
-library(curl)
-library(tidyverse)
-library(zoo)
-library(imputeTS)
-library(stringr)
-library(magick)
-library(grid)
-library(ggplot2)
-library(fs)
-library(bayestestR)
+# Define the packages you want to use
+packages <- c(
+  "tidyverse", "zoo", "imputeTS", "stringr", "magick", 
+  "ggplot2", "devtools", "bayestestR", "curl", "tcltk","fs"
+)
 
+# Function to install and load packages
+install_load_packages <- function(packages) {
+  # Check which packages are not installed
+  not_installed <- setdiff(packages, rownames(installed.packages()))
+  
+  # Install the missing packages
+  if (length(not_installed) > 0) {
+    install.packages(not_installed)
+  }
+  
+  # Load all the packages
+  invisible(sapply(packages, library, character.only = TRUE))
+}
 
+# Call the function to install and load packages
+install_load_packages(packages)
+
+# Additional step for installing a package from GitHub
+devtools::install_github("TJMurphy/nlfitr", force = TRUE)
 
 #filesystem_create
 
-
-
-folder <- "data"
-
-if (file.exists(folder)) {
-  
-  cat("The folder already exists")
-  
-} else {
-  
-  dir.create(folder)
-  
-}
 folder2 <- "Master FMD Export"
 
 if (file.exists(folder2)) {
@@ -52,12 +49,13 @@ if (file.exists(folder4)) {
   dir.create(folder4)
   
 }
-
-
+directory <- tclvalue(tkchooseDirectory())
+dia_file <- file.path(directory,"DIA.csv")
+lc_file <- file.path(directory,"LC.txt")
 #dataload labchart files downsample by 333 to match DIA, blockheaderON, Time selected as true
-dia_data <- read.delim("data/DIA.csv", header=F,sep=",", skip=49)
+dia_data <- read.delim(dia_file, header=F,sep=",", skip=49)
 dia_data <- rename(dia_data, "diameter_raw"= "V2", "index"="V1", "participant_id"="V7","diameter"="V6")
-lc_data <- read.delim("data/LC.txt", header=F, sep="\t",skip=9)
+lc_data <- read.delim(lc_file, header=F, sep="\t",skip=9)
 #visco_data <- read.csv("data/VISC.csv", header=F,skip=45)
 dia_data <- subset(dia_data, select = c("diameter","index","participant_id"))
 #file_id
@@ -66,12 +64,13 @@ file.id <- str_replace_all(string=file.id, pattern=".txt", repl="")
 participant.id <- as.character(dia_data[1,3])
 participant.id <- str_replace_all(string=file.id, pattern=".txt", repl="")
 
-
-fmd_data <- cbind(head(dia_data,5000),head(lc_data,5000))
+fmd_length <- min(nrow(dia_data),nrow(lc_data))
+fmd_data <- cbind(head(dia_data,fmd_length),head(lc_data,fmd_length))
 fmd_data <- rename(fmd_data,"time"="V1","flow_vel"="V2","fing_pres"="V3")
 
-bl_data <- head(fmd_data,500)
-fmd_data <- tail(fmd_data,1400)
+
+bl_data <- fmd_data[50:550, ]
+fmd_data <- tail(fmd_data,1800)
 
 #visco_data <-cbind(visco_data$V8,visco_data$V4)
 #visco_data <- as.data.frame(visco_data)
@@ -96,7 +95,7 @@ if (file.exists(file.path(getwd(),"Analyzed",participant.id,file.id,folder3), re
 
 #smooth
 fill_dia <- na_interpolation(fmd_data$diameter)
-smo_index <- seq(1, 1400, by = 1) 
+smo_index <- seq(1, 1800, by = 1) 
 smo_dia <- rollmean(fill_dia, k = 30, fill = NA)
 smo_Qvel <- rollmean(fmd_data$flow_vel, k=30, fill= NA)
 smo_fing_pres <- rollmean(fmd_data$fing_pres, k=30, fill= NA)
@@ -105,7 +104,7 @@ smo_fmd <- as.data.frame(smo_fmd)
 fmd_clean <- as.data.frame(smo_fmd)
 
 fmd_clean <- rename(fmd_clean,"diameter"="smo_dia","flow_vel"="smo_Qvel","fing_pres"="smo_fing_pres","index"="smo_index")
-
+fmd_clean$index <- fmd_clean$index/10
 #variablecreate
 
 
@@ -126,7 +125,7 @@ max_dia_row <-  which.max(fmd_clean$diameter)
 max_row_num <- which(row.names(fmd_clean) == max_dia_row)
 auc_df <- cbind.data.frame(head(fmd_clean$shear_rate,max_row_num),head(fmd_clean$index,max_row_num))
 auc_df <- rename(auc_df,"shearrate"="head(fmd_clean$shear_rate, max_row_num)","index"="head(fmd_clean$index, max_row_num)")
-auc_df$time <- auc_df$index/30
+auc_df$time <- auc_df$index
 auc_df[is.na(auc_df)] <- 0
 auc_ss <- area_under_curve(auc_df$time, auc_df$shearrate, method = "trapezoid")
 
@@ -204,8 +203,8 @@ if (file.exists(file.path(getwd(),"Analyzed",participant.id,file.id,"data","BL_D
   cat("The folder already exists")
   
 } else {
-  data_files <- list.files("data")
-  file_copy(file.path(getwd(),"data",data_files),file.path(getwd(),"Analyzed",participant.id,file.id,"data"),data_files)
+  data_files <- list.files(directory)
+  file_copy(file.path(directory,data_files),file.path(getwd(),"Analyzed",participant.id,file.id,"data"),data_files)
 }
 
 #results_print csv
