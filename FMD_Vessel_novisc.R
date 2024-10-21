@@ -8,12 +8,15 @@ packages <- c(
 
 # Function to install and load packages
 install_load_packages <- function(packages) {
+  # Update all packages without prompting
+  update.packages(ask = FALSE)
+  
   # Check which packages are not installed
   not_installed <- setdiff(packages, rownames(installed.packages()))
   
-  # Install the missing packages
+  # Install the missing packages without prompting for updates
   if (length(not_installed) > 0) {
-    install.packages(not_installed)
+    install.packages(not_installed, ask = FALSE)
   }
   
   # Load all the packages
